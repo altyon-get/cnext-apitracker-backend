@@ -1,0 +1,54 @@
+###
+GET http://127.0.0.1:8000/api/api-list/
+###
+
+###
+GET http://127.0.0.1:8000/api/api-list/3/call-logs/
+###
+
+###
+POST http://127.0.0.1:8000/api/api-list/
+Content-Type: application/json
+
+{"api_endpoint": "https://jsonplaceholder.typicode.com/todos/10", "request_type": "GET", "params": "None"}
+###
+
+
+###
+PATCH http://127.0.0.1:8000/apis/1/
+Content-Type: application/json
+
+{
+  "id": 1,
+  "api_endpoint": "https://jsonplaceholder.typicode.com/todos/7"
+}
+###
+
+###
+PUT http://127.0.0.1:8000/apis/1/
+Content-Type: application/json
+
+{ "id": 1,
+  "api_endpoint": "https://jsonplaceholder.typicode.com/todos/8", "request_type": "GET", "params": "None"}
+###
+
+###
+GET http://127.0.0.1:8000/api/hit-api/3
+###
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

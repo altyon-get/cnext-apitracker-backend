@@ -77,11 +77,8 @@ from decouple import config
 
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',
-        'NAME': config('DB_NAME'),
-        'CLIENT': {
-            'host': config('DB_HOST')
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
