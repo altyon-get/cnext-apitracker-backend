@@ -60,6 +60,19 @@ class APIDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class APICallLogListView(APIView):
+    def get(self, request, api_pk):
+        try:
+            api = APIList.objects.get(pk=api_pk)
+            call_logs = APICallLog.objects.filter(api=api)
+            serializer = APICallLogSerializer(call_logs, many=True)
+            return Response(serializer.data)
+        except APIList.DoesNotExist:
+            return Response({'error': 'APIList not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 def hit_api_and_log(request, api_id):
     api_entry = get_object_or_404(APIList, id=api_id)
     print(api_entry , ' -XXX')
@@ -96,18 +109,6 @@ def hit_api_and_log(request, api_id):
         'response_time': response_time
     })
 
-
-class APICallLogListView(APIView):
-    def get(self, request, api_pk):
-        try:
-            api = APIList.objects.get(pk=api_pk)
-            call_logs = APICallLog.objects.filter(api=api)
-            serializer = APICallLogSerializer(call_logs, many=True)
-            return Response(serializer.data)
-        except APIList.DoesNotExist:
-            return Response({'error': 'APIList not found'}, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
