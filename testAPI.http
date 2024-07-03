@@ -10,7 +10,7 @@ GET http://127.0.0.1:8000/api/api-list/3/call-logs/
 POST http://127.0.0.1:8000/api/api-list/
 Content-Type: application/json
 
-{"api_endpoint": "https://jsonplaceholder.typicode.com/todos/10", "request_type": "GET", "params": "None"}
+{"api_endpoint": "https://jsonplaceholder.typicode.com/todos/11", "request_type": "GET", "params": "None"}
 ###
 
 

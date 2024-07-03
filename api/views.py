@@ -60,5 +60,56 @@ class APIDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+def hit_api_and_log(request, api_id):
+    api_entry = get_object_or_404(APIList, id=api_id)
+    print(api_entry , ' -XXX')
+
+    start_time = timezone.now()
+    response = requests.get(api_entry.api_endpoint)
+    end_time = timezone.now()
+
+    response_time = (end_time - start_time).total_seconds()
+    print(response_time, ' -XXX')
+
+    if response.status_code in [200, 201, 202, 203]:
+        status = 1
+    else:
+        status = 0
+
+    api_entry.status = status
+    api_entry.code = response.status_code
+    api_entry.updated_at = timezone.now()
+    api_entry.save()
+
+    api_log = APICallLog(
+        api=api_entry,
+        timestamp=start_time,
+        response_time=response_time
+    )
+    api_log.save()
+
+    # Return a JSON response
+    return JsonResponse({
+        'api_endpoint': api_entry.api_endpoint,
+        'status': 'Ok' if status == 1 else 'Not Ok',
+        'response_code': response.status_code,
+        'response_time': response_time
+    })
+
+
+class APICallLogListView(APIView):
+    def get(self, request, api_pk):
+        try:
+            api = APIList.objects.get(pk=api_pk)
+            call_logs = APICallLog.objects.filter(api=api)
+            serializer = APICallLogSerializer(call_logs, many=True)
+            return Response(serializer.data)
+        except APIList.DoesNotExist:
+            return Response({'error': 'APIList not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 
