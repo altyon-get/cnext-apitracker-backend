@@ -1,19 +1,20 @@
-# api/utils.py
 import requests
+from datetime import datetime
+from pymongo import MongoClient
 from django.utils import timezone
 from .models import APICallLog
-
+from cnext_apitracker_backend.mongodb import mongodb  # Import your MongoDB client instance
 
 def make_api_call(api_entry):
     start_time = timezone.now()
-    if api_entry.request_type == 'GET':
-        response = requests.get(api_entry.api_endpoint, params=eval(api_entry.params) if api_entry.params else {})
-    elif api_entry.request_type == 'POST':
-        response = requests.post(api_entry.api_endpoint, data=eval(api_entry.params) if api_entry.params else {})
-    elif api_entry.request_type == 'PUT':
-        response = requests.put(api_entry.api_endpoint, data=eval(api_entry.params) if api_entry.params else {})
-    elif api_entry.request_type == 'DELETE':
-        response = requests.delete(api_entry.api_endpoint, data=eval(api_entry.params) if api_entry.params else {})
+    if api_entry['request_type'] == 'GET':
+        response = requests.get(api_entry['api_endpoint'], params=eval(api_entry['params']) if api_entry['params'] else {})
+    elif api_entry['request_type'] == 'POST':
+        response = requests.post(api_entry['api_endpoint'], data=eval(api_entry['params']) if api_entry['params'] else {})
+    elif api_entry['request_type'] == 'PUT':
+        response = requests.put(api_entry['api_endpoint'], data=eval(api_entry['params']) if api_entry['params'] else {})
+    elif api_entry['request_type'] == 'DELETE':
+        response = requests.delete(api_entry['api_endpoint'], data=eval(api_entry['params']) if api_entry['params'] else {})
     else:
         response = None
 
@@ -29,14 +30,16 @@ def make_api_call(api_entry):
 
 def handle_api_response(api_entry, response_data):
     if response_data:
-        api_entry.status = response_data['status_value']
-        api_entry.code = response_data['response'].status_code
-        api_entry.updated_at = timezone.now()
-        api_entry.save()
+        api_collection = mongodb.get_collection('apilist')
+        api_entry['status'] = response_data['status_value']
+        api_entry['code'] = response_data['response'].status_code
+        api_entry['updated_at'] = timezone.now()
+        api_collection.update_one({'_id': api_entry['_id']}, {'$set': api_entry})
 
-        api_log = APICallLog(
-            api=api_entry,
-            timestamp=timezone.now(),
-            response_time=response_data['response_time']
-        )
-        api_log.save()
+        call_logs_collection = mongodb.get_collection('apicalllog')
+        api_log = {
+            'api_id': api_entry['_id'],
+            'timestamp': timezone.now(),
+            'response_time': response_data['response_time']
+        }
+        call_logs_collection.insert_one(api_log)

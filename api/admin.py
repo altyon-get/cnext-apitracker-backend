@@ -3,5 +3,5 @@ from api.models import *
 
 
 # Register your models here.
-admin.site.register(APIList)
-admin.site.register(APICallLog)
+# admin.site.register(APIList)
+# admin.site.register(APICallLog)
