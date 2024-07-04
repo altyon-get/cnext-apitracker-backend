@@ -10,12 +10,24 @@ GET http://127.0.0.1:8000/api/api-list/66864cd13212109046cf1f42/call-logs/
 POST http://127.0.0.1:8000/api/api-list/
 Content-Type: application/json
 
-{"api_endpoint": "https://jsonplaceholder.typicode.com/todos/1", "request_type": "GET", "params": "None"}
+{"api_endpoint": "https://jsonplaceholder.typicode.com/todos/21", "request_type": "GET", "params": "None"}
 ###
 
 
+
 ###
-PATCH http://127.0.0.1:8000/api/api-list/6686481028c05384a658ba2f/
+GET http://127.0.0.1:8000/api/api-list/66864cd13212109046cf1f42/
+###
+
+###
+PUT http://127.0.0.1:8000/api/api-list/66864cd13212109046cf1f42/
+Content-Type: application/json
+
+{"api_endpoint": "https://jsonplaceholder.typicode.com/todos/8", "request_type": "GET", "params": "None"}
+###
+
+###
+PATCH http://127.0.0.1:8000/api/api-list/66864cd13212109046cf1f42/
 Content-Type: application/json
 
 {
@@ -24,19 +36,13 @@ Content-Type: application/json
 ###
 
 ###
-PUT http://127.0.0.1:8000/apis/1/
-Content-Type: application/json
-
-{ "id": 1,
-  "api_endpoint": "https://jsonplaceholder.typicode.com/todos/8", "request_type": "GET", "params": "None"}
+DELETE http://127.0.0.1:8000/api/api-list/66864362e342a62535f9a2cb/
 ###
+
+
 
 ###
 GET http://127.0.0.1:8000/api/hit-api/66864cd13212109046cf1f42/
-###
-
-###
-DELETE http://127.0.0.1:8000/api/api-list/66864362e342a62535f9a2cb/
 ###
 
 
