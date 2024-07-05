@@ -1,12 +1,10 @@
 import requests
 from django.http import JsonResponse
-from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from bson.objectid import ObjectId
 from cnext_apitracker_backend.mongodb import mongodb
-from .serializers import APIListSerializer, APICallLogSerializer
 from .utils import make_api_call, handle_api_response
 
 
@@ -92,41 +90,10 @@ class APICallLogListView(APIView):
 
 def hit_api_and_log(request, api_id):
     api_collection = mongodb.get_collection('apilist')
-    call_logs_collection = mongodb.get_collection('apicalllog')
 
     api_entry = api_collection.find_one({'_id': ObjectId(api_id)})
     if not api_entry:
         return JsonResponse({'error': 'APIList not found'}, status=404)
 
-    start_time = timezone.now()
-    response = requests.get(api_entry['api_endpoint'])
-    end_time = timezone.now()
-
-    response_time = (end_time - start_time).total_seconds()
-    status_value = 1 if response.status_code in [200, 201, 202, 203] else 0
-
-    api_entry['status'] = status_value
-    api_entry['code'] = response.status_code
-    api_entry['updated_at'] = timezone.now()
-
-    update_data = {
-        'status': api_entry['status'],
-        'code': api_entry['code'],
-        'updated_at': api_entry['updated_at']
-    }
-
-    api_collection.update_one({'_id': ObjectId(api_id)}, {'$set': update_data})
-
-    api_log = {
-        'api': ObjectId(api_id),
-        'timestamp': start_time,
-        'response_time': response_time
-    }
-    call_logs_collection.insert_one(api_log)
-
-    return JsonResponse({
-        'api_endpoint': api_entry['api_endpoint'],
-        'status': 'Ok' if status_value == 1 else 'Not Ok',
-        'response_code': response.status_code,
-        'response_time': response_time
-    })
+    response_data = make_api_call(api_entry)
+    return handle_api_response(api_entry, response_data)
