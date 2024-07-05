@@ -39,13 +39,18 @@ Content-Type: application/json
 DELETE http://127.0.0.1:8000/api/api-list/66864362e342a62535f9a2cb/
 ###
 
-
-
 ###
 GET http://127.0.0.1:8000/api/hit-api/66864cd13212109046cf1f42/
 ###
 
+###
+GET http://127.0.0.1:8000/api/hit-api/6686b56de3cdf27dd1d3f0a9/
+###
 
+
+#To run celery:
+#celery -A cnext_apitracker_backend worker --loglevel=info
+#celery -A cnext_apitracker_backend beat --loglevel=info
 
 
 

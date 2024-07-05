@@ -1,10 +1,11 @@
 from celery import shared_task
-from django.utils import timezone
-from .models import APIList, APICallLog
+from .models import APIList
 from .utils import make_api_call, handle_api_response
 
 @shared_task
 def hit_apis_and_log():
+    # apis = APIList.objects.all()
+    print('hit_apis_and_log called')
     apis = APIList.get_all()
     for api_entry in apis:
         print(api_entry, ' -for')

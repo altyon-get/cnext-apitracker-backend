@@ -1,9 +1,7 @@
 import requests
-from datetime import datetime
-from pymongo import MongoClient
+from django.http import JsonResponse
 from django.utils import timezone
-from .models import APICallLog
-from cnext_apitracker_backend.mongodb import mongodb  # Import your MongoDB client instance
+from cnext_apitracker_backend.mongodb import mongodb
 
 def make_api_call(api_entry):
     start_time = timezone.now()
@@ -38,8 +36,16 @@ def handle_api_response(api_entry, response_data):
 
         call_logs_collection = mongodb.get_collection('apicalllog')
         api_log = {
-            'api_id': api_entry['_id'],
+            'api': api_entry['_id'],
             'timestamp': timezone.now(),
             'response_time': response_data['response_time']
         }
+        print(api_log,)
         call_logs_collection.insert_one(api_log)
+
+        return JsonResponse({
+            'api_endpoint': api_entry['api_endpoint'],
+            'status': 'Ok' if response_data['status_value'] == 1 else 'Not Ok',
+            'response_code': response_data['response'].status_code,
+            'response_time': response_data['response_time']
+        })
