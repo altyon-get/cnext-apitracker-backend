@@ -32,11 +32,17 @@ class APIList:
 
     @staticmethod
     def get_all():
-        return list(APIList.collection.find())
+        apis = list(APIList.collection.find())
+        for api in apis:
+            api['_id'] = str(api['_id'])
+        return apis
 
     @staticmethod
     def get_by_id(api_id):
-        return APIList.collection.find_one({'_id': ObjectId(api_id)})
+        api = APIList.collection.find_one({'_id': ObjectId(api_id)})
+        if api:
+            api['_id'] = str(api['_id'])
+        return api
 
     @staticmethod
     def delete(api_id):
@@ -67,14 +73,17 @@ class APICallLog:
 
     @staticmethod
     def get_by_api(api_id, page=1, page_size=10):
-        print(page, page_size, api_id)
         skips = page_size * (page - 1)
         cursor = (APICallLog.collection
                   .find({'api_id': ObjectId(api_id)})
                   .skip(skips)
                   .limit(page_size))
         total_logs = APICallLog.collection.count_documents({'api_id': ObjectId(api_id)})
-        return list(cursor), total_logs
+        call_logs = list(cursor)
+        for log in call_logs:
+            log['_id'] = str(log['_id'])
+            log['api_id'] = str(log['api_id'])
+        return call_logs, total_logs
 
     @staticmethod
     def delete(api_id):

@@ -15,12 +15,18 @@ class APIListView(APIView):
 
     def post(self, request):
         data = request.data
-        api_entry = APIList(**data)
-        api_entry.save()
-        response_data = make_api_call(api_entry)
-        handle_api_response(response_data)
-        api_entry._id = str(api_entry._id)
-        return Response(api_entry.__dict__)
+        if not data.get('api_endpoint') or not data.get('request_type'):
+            return Response({'error': 'api_endpoint and request_type are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            api_entry = APIList(**data)
+            api_entry.save()
+            response_data = make_api_call(api_entry)
+            handle_api_response(response_data)
+            api_entry._id = str(api_entry._id)
+            return Response(api_entry.__dict__)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class APIDetailView(APIView):
@@ -68,19 +74,23 @@ class APIDetailView(APIView):
 
 class APICallLogListView(APIView):
     def get(self, request, api_id):
-        page = int(request.query_params.get('page', 1))
-        page_size = int(request.query_params.get('page_size', 10))
+        page = request.query_params.get('page', 1)
+        page_size = request.query_params.get('page_size', 10)
+
+        try:
+            page = int(page)
+            page_size = int(page_size)
+        except ValueError:
+            return Response({'error': 'page and page_size must be integers'}, status=status.HTTP_400_BAD_REQUEST)
 
         if page < 1 and page_size < 1:
             return Response({'error': 'page and page size must be greater than 1'})
+
         api = APIList.get_by_id(api_id)
         if not api:
             return Response({'error': 'APIList not found'}, status=status.HTTP_404_NOT_FOUND)
 
         call_logs, total_logs = APICallLog.get_by_api(api_id, page, page_size)
-        for log in call_logs:
-            log['_id'] = str(log['_id'])
-            log['api_id'] = str(log['api_id'])
         return Response({
             'call_logs': call_logs,
             'page': page,
