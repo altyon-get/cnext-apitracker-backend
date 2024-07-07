@@ -69,10 +69,10 @@ class APICallLog:
     def get_by_api(api_id, page=1, page_size=10):
         skips = page_size * (page - 1)
         cursor = (APICallLog.collection
-                  .find({'api': ObjectId(api_id)})
+                  .find({'api_id': ObjectId(api_id)})
                   .skip(skips)
                   .limit(page_size))
-        total_logs = APICallLog.collection.count_documents({'api': ObjectId(api_id)})
+        total_logs = APICallLog.collection.count_documents({'api_id': ObjectId(api_id)})
         return list(cursor), total_logs
 
     @staticmethod
