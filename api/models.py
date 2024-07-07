@@ -67,6 +67,7 @@ class APICallLog:
 
     @staticmethod
     def get_by_api(api_id, page=1, page_size=10):
+        print(page, page_size, api_id)
         skips = page_size * (page - 1)
         cursor = (APICallLog.collection
                   .find({'api_id': ObjectId(api_id)})

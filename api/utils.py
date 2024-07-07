@@ -27,6 +27,7 @@ def make_api_call(api_entry):
     }
 
 def handle_api_response(api_entry, response_data):
+    print('handle_api_response for ', response_data)
     if response_data:
         api_collection = mongodb.get_collection('apilist')
         api_entry['status'] = response_data['status_value']
@@ -35,12 +36,13 @@ def handle_api_response(api_entry, response_data):
         api_collection.update_one({'_id': api_entry['_id']}, {'$set': api_entry})
 
         call_logs_collection = mongodb.get_collection('apicalllog')
+        print(call_logs_collection)
         api_log = {
-            'api': api_entry['_id'],
+            'api_id': api_entry['_id'],
             'timestamp': timezone.now(),
             'response_time': response_data['response_time']
         }
-        print(api_log,)
+        print(api_log,'saving to call logs')
         call_logs_collection.insert_one(api_log)
 
         return JsonResponse({
@@ -49,3 +51,5 @@ def handle_api_response(api_entry, response_data):
             'response_code': response_data['response'].status_code,
             'response_time': response_data['response_time']
         })
+    else:
+        print('YYY')

@@ -3,7 +3,7 @@ GET http://127.0.0.1:8000/api/api-list/
 ###
 
 ###
-GET http://127.0.0.1:8000/api/api-list/66864cd13212109046cf1f42/call-logs/
+GET http://127.0.0.1:8000/api/api-list/6687bda24e21750a7de07216/call-logs/
 ###
 
 ###
@@ -44,9 +44,12 @@ GET http://127.0.0.1:8000/api/hit-api/66864cd13212109046cf1f42/
 ###
 
 ###
-GET http://127.0.0.1:8000/api/hit-api/6686b56de3cdf27dd1d3f0a9/
+GET http://127.0.0.1:8000/api/hit-api/6687bda24e21750a7de07216/
 ###
 
+###
+GET http://127.0.0.1:8000/api/api-list/6687bda24e21750a7de07216/call-logs/
+###
 
 #To run celery:
 #celery -A cnext_apitracker_backend worker --loglevel=info

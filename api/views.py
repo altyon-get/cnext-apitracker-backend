@@ -68,10 +68,10 @@ class APIDetailView(APIView):
 
 class APICallLogListView(APIView):
     def get(self, request, api_id):
-        page= request.GET.get('page')
-        page_size= request.GET.get('page_size')
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 10))
 
-        if page and page_size:
+        if page < 1 and page_size < 1:
             return Response({'error': 'page and page size must be greater than 1'})
         api = APIList.get_by_id(api_id)
         if not api:
