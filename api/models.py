@@ -16,19 +16,32 @@ class APIList:
         self.updated_at = updated_at
         self._id = _id
 
-    def save(self):
-        data = self.__dict__.copy()
+    def save(self, data=None):
+
+        if data is None:
+            data = {
+                'api_endpoint': self.api_endpoint,
+                'request_type': self.request_type,
+                'params': self.params,
+                'status': self.status,
+                'code': self.code,
+                'updated_at': self.updated_at,
+            }
+
         if self._id:
-            data['_id'] = ObjectId(self._id)
             result = self.collection.find_one_and_update(
-                {'_id': self._id},
+                {'_id': ObjectId(self._id)},
                 {'$set': data},
                 return_document=ReturnDocument.AFTER,
             )
-            self._id = result['_id']
+            self._id = str(result['_id'])
         else:
             result = self.collection.insert_one(data)
-            self._id = result.inserted_id
+            self._id = str(result.inserted_id)
+            result = data
+
+        return APIList(**result)
+
 
     @staticmethod
     def get_all():
@@ -39,10 +52,11 @@ class APIList:
 
     @staticmethod
     def get_by_id(api_id):
-        api = APIList.collection.find_one({'_id': ObjectId(api_id)})
-        if api:
-            api['_id'] = str(api['_id'])
-        return api
+        api_data = APIList.collection.find_one({'_id': ObjectId(api_id)})
+        if api_data:
+            api_data['_id'] = str(api_data['_id'])
+            return APIList(**api_data)
+        return None
 
     @staticmethod
     def delete(api_id):
@@ -59,8 +73,8 @@ class APICallLog:
         self._id = _id
 
     def save(self):
-        data = self.__dict__.copy()
         if self._id:
+            data = self.__dict__.copy()
             result = self.collection.find_one_and_update(
                 {'_id': self._id},
                 {'$set': data},
@@ -68,17 +82,22 @@ class APICallLog:
             )
             self._id = result['_id']
         else:
+            data = {
+                'api_id': self.api_id,
+                'timestamp': self.timestamp,
+                'response_time': self.response_time,
+            }
             result = self.collection.insert_one(data)
             self._id = result.inserted_id
+            result = data
 
     @staticmethod
     def get_by_api(api_id, page=1, page_size=10):
         skips = page_size * (page - 1)
-        cursor = (APICallLog.collection
-                  .find({'api_id': ObjectId(api_id)})
+        cursor = (APICallLog.collection.find({'api_id': api_id})
                   .skip(skips)
                   .limit(page_size))
-        total_logs = APICallLog.collection.count_documents({'api_id': ObjectId(api_id)})
+        total_logs = APICallLog.collection.count_documents({'api_id': api_id})
         call_logs = list(cursor)
         for log in call_logs:
             log['_id'] = str(log['_id'])

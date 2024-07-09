@@ -3,31 +3,30 @@ GET http://127.0.0.1:8000/api/api-list/
 ###
 
 ###
-GET http://127.0.0.1:8000/api/api-list/6687bda24e21750a7de07216/call-logs/
+GET http://127.0.0.1:8000/api/api-list/668cc90946609801d88cdcbd/call-logs/
 ###
 
 ###
 POST http://127.0.0.1:8000/api/api-list/
 Content-Type: application/json
 
-{"api_endpoint": "https://jsonplaceholder.typicode.com/todos/21", "request_type": "GET", "params": "None"}
+{"api_endpoint": "https://jsonplaceholder.typicode.com/todos/3", "request_type": "GET", "params": "None"}
 ###
 
 
+###
+GET http://127.0.0.1:8000/api/api-list/668ce137cd952bfaab3fa011/
+###
 
 ###
-GET http://127.0.0.1:8000/api/api-list/66864cd13212109046cf1f42/
-###
-
-###
-PUT http://127.0.0.1:8000/api/api-list/66864cd13212109046cf1f42/
+PUT http://127.0.0.1:8000/api/api-list/668ce137cd952bfaab3fa011/
 Content-Type: application/json
 
-{"api_endpoint": "https://jsonplaceholder.typicode.com/todos/8", "request_type": "GET", "params": "None"}
+{"api_endpoint": "https://jsonplaceholder.typicode.com/todos/97", "request_type": "GET", "params": "None"}
 ###
 
 ###
-PATCH http://127.0.0.1:8000/api/api-list/66864cd13212109046cf1f42/
+PATCH http://127.0.0.1:8000/api/api-list/668ce137cd952bfaab3fa011/
 Content-Type: application/json
 
 {
@@ -36,19 +35,15 @@ Content-Type: application/json
 ###
 
 ###
-DELETE http://127.0.0.1:8000/api/api-list/66864362e342a62535f9a2cb/
+DELETE http://127.0.0.1:8000/api/api-list/668ce137cd952bfaab3fa011/
 ###
 
 ###
-GET http://127.0.0.1:8000/api/hit-api/66864cd13212109046cf1f42/
+GET http://127.0.0.1:8000/api/hit-api/668ce0b9514fd7e836b31157/
 ###
 
 ###
-GET http://127.0.0.1:8000/api/hit-api/6687bda24e21750a7de07216/
-###
-
-###
-GET http://127.0.0.1:8000/api/api-list/6687bda24e21750a7de07216/call-logs/
+GET http://127.0.0.1:8000/api/api-list/668ce086a4c268c294a2e40a/call-logs/
 ###
 
 #To run celery:

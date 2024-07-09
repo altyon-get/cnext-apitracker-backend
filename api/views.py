@@ -15,15 +15,19 @@ class APIListView(APIView):
 
     def post(self, request):
         data = request.data
-        if not data.get('api_endpoint') or not data.get('request_type'):
-            return Response({'error': 'api_endpoint and request_type are required'}, status=status.HTTP_400_BAD_REQUEST)
+        required_fields = ['api_endpoint', 'request_type']
 
+        for field in required_fields:
+            if field not in data:
+                return Response({'error': f'{field} is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        #TODO: Validate data before saving
+
+        api_entry = APIList(**data)
         try:
-            api_entry = APIList(**data)
             api_entry.save()
             response_data = make_api_call(api_entry)
-            handle_api_response(response_data)
-            api_entry._id = str(api_entry._id)
+            handle_api_response(api_entry, response_data)
             return Response(api_entry.__dict__)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -37,32 +41,50 @@ class APIDetailView(APIView):
         api_entry = self.get_object(api_id)
         if not api_entry:
             return Response({'error': 'APIList not found'}, status=status.HTTP_404_NOT_FOUND)
-        api_entry['_id'] = str(api_entry['_id'])
-        return Response(api_entry)
+        return Response(api_entry.__dict__)
 
     def put(self, request, api_id):
         api_entry = self.get_object(api_id)
         if not api_entry:
             return Response({'error': 'APIList not found'}, status=status.HTTP_404_NOT_FOUND)
-        for key, value in request.data.items():
-            setattr(api_entry, key, value)
-        api_entry.save()
-        response_data = make_api_call(api_entry)
-        handle_api_response(api_entry, response_data)
-        api_entry._id = str(api_entry._id)
-        return Response(api_entry.__dict__)
 
-    def patch(self, request, api_id):
-        api_entry = self.get_object(api_id)
-        if not api_entry:
-            return Response({'error': 'APIList not found'}, status=status.HTTP_404_NOT_FOUND)
-        for key, value in request.data.items():
-            setattr(api_entry, key, value)
-        api_entry.save()
-        response_data = make_api_call(api_entry)
-        handle_api_response(api_entry, response_data)
-        api_entry._id = str(api_entry._id)
-        return Response(api_entry)
+        data = request.data
+        required_fields = ['api_endpoint', 'request_type']
+        for field in required_fields:
+            if field not in data:
+                return Response({'error': 'Missing required field'}, status=status.HTTP_400_BAD_REQUEST)
+
+        #TODO: validate data before saving
+
+        try:
+            api_entry = api_entry.save(data)
+            response_data = make_api_call(api_entry)
+            handle_api_response(api_entry, response_data)
+            api_entry._id = str(api_entry._id)
+            return Response(api_entry.__dict__)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # def patch(self, request, api_id):
+    #     api_entry = self.get_object(api_id)
+    #     if not api_entry:
+    #         return Response({'error': 'APIList not found'}, status=status.HTTP_404_NOT_FOUND)
+    #
+    #     for key, value in request.data.items():
+    #         setattr(api_entry, key, value)
+    #
+    #     ##validate data before saving
+    #     data = request.data
+    #
+    #     try:
+    #         api_entry = api_entry.save(data)
+    #         response_data = make_api_call(api_entry)
+    #         handle_api_response(api_entry, response_data)
+    #         api_entry._id = str(api_entry._id)
+    #         return Response(api_entry.__dict__)
+    #     except Exception as e:
+    #         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    #
 
     def delete(self, request, api_id, *args, **kwargs):
         api_entry = self.get_object(api_id)
