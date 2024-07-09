@@ -15,14 +15,14 @@ Content-Type: application/json
 
 
 ###
-GET http://127.0.0.1:8000/api/api-list/668ce137cd952bfaab3fa011/
+GET http://127.0.0.1:8000/api/api-list/668d01782d489964ee90e3b3/
 ###
 
 ###
-PUT http://127.0.0.1:8000/api/api-list/668ce137cd952bfaab3fa011/
+PUT http://127.0.0.1:8000/api/api-list/668d01782d489964ee90e3b3/
 Content-Type: application/json
 
-{"api_endpoint": "https://jsonplaceholder.typicode.com/todos/97", "request_type": "GET", "params": "None"}
+{"api_endpoint": "https://jsonplaceholder.typicode.com/todos/197", "request_type": "GET", "params": "None"}
 ###
 
 ###
@@ -35,7 +35,7 @@ Content-Type: application/json
 ###
 
 ###
-DELETE http://127.0.0.1:8000/api/api-list/668ce137cd952bfaab3fa011/
+DELETE http://127.0.0.1:8000/api/api-list/668d01782d489964ee90e3b3/
 ###
 
 ###

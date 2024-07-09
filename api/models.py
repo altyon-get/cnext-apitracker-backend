@@ -42,13 +42,15 @@ class APIList:
 
         return APIList(**result)
 
-
     @staticmethod
     def get_all():
         apis = list(APIList.collection.find())
+        api_instances = []
         for api in apis:
             api['_id'] = str(api['_id'])
-        return apis
+            api_instance = APIList(**api)
+            api_instances.append(api_instance)
+        return api_instances
 
     @staticmethod
     def get_by_id(api_id):

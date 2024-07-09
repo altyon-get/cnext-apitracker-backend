@@ -9,9 +9,10 @@ from .utils import make_api_call, handle_api_response
 class APIListView(APIView):
     def get(self, request):
         apis = APIList.get_all()
-        for api in apis:
+        api_dicts = [api.__dict__ for api in apis]
+        for api in api_dicts:
             api['_id'] = str(api['_id'])
-        return Response(apis)
+        return Response(api_dicts)
 
     def post(self, request):
         data = request.data
