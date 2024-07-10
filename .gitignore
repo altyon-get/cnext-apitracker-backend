@@ -2,17 +2,12 @@
 .vscode/
 db.sqlite3
 
-.env
-
 __pycache__/
 *.py[cod]
 *$py.class
 
 venv
-/venv
-venv/
-env/
+.env
 
 api/migrations
-clearybeat-schedule
-/clearybeat-schedule
+celerybeat-schedule

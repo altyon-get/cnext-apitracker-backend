@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.utils import timezone
 from .models import APIList, APICallLog
 import json
+from decouple import config
 
 
 def make_api_call(api_entry):
@@ -16,8 +17,12 @@ def make_api_call(api_entry):
         params = {}
     method = api_entry.request_type.upper()
 
+    headers = {
+        'x-api-key': config('X_API_KEY')
+    }
+
     try:
-        response = requests.request(method, api_entry.api_endpoint, params=params)
+        response = requests.request(method, api_entry.api_endpoint, params=params, headers=headers)
         status_value = 1 if response.status_code in [200, 201, 202, 203] else 0
     except requests.RequestException as e:
         response = None
@@ -32,7 +37,6 @@ def make_api_call(api_entry):
         'status_value': status_value,
         'response_time': response_time,
     }
-
 
 def handle_api_response(api_entry, response_data):
     if response_data:
@@ -56,3 +60,20 @@ def handle_api_response(api_entry, response_data):
         })
 
     return JsonResponse({'error': 'Invalid response data'}, status=500)
+
+
+import jwt
+from datetime import datetime, timedelta
+from django.conf import settings
+
+def generate_jwt(payload, expiry_minutes=30):
+    payload['exp'] = datetime.utcnow() + timedelta(minutes=expiry_minutes)
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+
+def decode_jwt(token):
+    try:
+        return jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+    except jwt.ExpiredSignatureError as e:
+        return None
+    except jwt.InvalidTokenError as e:
+        return None

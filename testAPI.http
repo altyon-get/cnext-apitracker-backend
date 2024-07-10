@@ -3,6 +3,15 @@ GET http://127.0.0.1:8000/api/api-list/
 ###
 
 ###
+GET http://127.0.0.1:8000/api/hit-api/668d17212d489964ee90e3b6/
+###
+
+###
+GET http://127.0.0.1:8000/api/hit-api/668d3cb24cc0aa001cd12d80/
+###
+
+
+###
 GET http://127.0.0.1:8000/api/api-list/668cc90946609801d88cdcbd/call-logs/
 ###
 
@@ -10,7 +19,11 @@ GET http://127.0.0.1:8000/api/api-list/668cc90946609801d88cdcbd/call-logs/
 POST http://127.0.0.1:8000/api/api-list/
 Content-Type: application/json
 
-{"api_endpoint": "https://jsonplaceholder.typicode.com/todos/3", "request_type": "GET", "params": "None"}
+{
+  "api_endpoint": "https://backend-service.careers360.de/api/1/cms/author-profile/6",
+  "request_type": "GET",
+  "params": "None"
+}
 ###
 
 
@@ -25,7 +38,7 @@ Content-Type: application/json
 {"api_endpoint": "https://jsonplaceholder.typicode.com/todos/197", "request_type": "GET", "params": "None"}
 ###
 
-###
+### Removed currently
 PATCH http://127.0.0.1:8000/api/api-list/668ce137cd952bfaab3fa011/
 Content-Type: application/json
 
@@ -35,11 +48,7 @@ Content-Type: application/json
 ###
 
 ###
-DELETE http://127.0.0.1:8000/api/api-list/668d01782d489964ee90e3b3/
-###
-
-###
-GET http://127.0.0.1:8000/api/hit-api/668ce0b9514fd7e836b31157/
+DELETE http://127.0.0.1:8000/api/api-list/668d3ab5ac296021d1c67806/
 ###
 
 ###
@@ -52,8 +61,19 @@ GET http://127.0.0.1:8000/api/api-list/668ce086a4c268c294a2e40a/call-logs/
 
 
 
+#Authenticaiton
+###
+POST http://127.0.0.1:8000/login/
+Content-Type: application/x-www-form-urlencoded
+
+username=admin&password=admin
+###
 
 
+# curl -H "Authorization: Bearer your_generated_token" http://localhost:8000/your-secure-endpoint/
+GET http://localhost:8000/api/api-list/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNzIwNjAzNTU5fQ.Uwd7WlNBLDdXYtwhD4ybJlQDAFSKWxO4BprmxK0echY
+###
 
 
 
