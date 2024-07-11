@@ -1,6 +1,7 @@
 amqp==5.2.0
 asgiref==3.8.1
 async-timeout==4.0.3
+backports.zoneinfo==0.2.1
 billiard==4.2.0
 boto3==1.34.139
 botocore==1.34.139
@@ -26,7 +27,8 @@ idna==3.7
 jmespath==1.0.1
 kombu==5.3.7
 mongoengine==0.28.2
-prompt_toolkit==3.0.47
+prompt-toolkit==3.0.47
+PyJWT==2.8.0
 pymongo==3.12.1
 python-crontab==3.2.0
 python-dateutil==2.9.0.post0
@@ -37,7 +39,7 @@ requests==2.32.3
 s3transfer==0.10.2
 six==1.16.0
 sqlparse==0.5.0
-typing_extensions==4.12.2
+typing-extensions==4.12.2
 tzdata==2024.1
 urllib3==1.26.19
 vine==5.1.0
