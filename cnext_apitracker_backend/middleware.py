@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from api.utils import decode_jwt
+from api.jwt_util import decode_jwt
 from django.urls import reverse, resolve
 
 #got this error: if not user or not user.is_active:rest_framework.request.WrappedAttributeError: 'dict' object has no attribute 'is_active'
