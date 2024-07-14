@@ -68,6 +68,7 @@ def validate_and_prepare_request(data):
 
 
 def store_request(group_name, data):
+    print('Storing request for ', group_name )
     try:
         request_data = validate_and_prepare_request(data)
         api_entry = APIList(
@@ -77,6 +78,8 @@ def store_request(group_name, data):
             params=request_data['params'],
             body=request_data['body']
         )
+        print(api_entry.__dict__)
+        api_entry.save()
         response_data = make_api_call(api_entry)
         # print(response_data)
         if response_data['response'] is None:
