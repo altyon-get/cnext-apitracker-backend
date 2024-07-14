@@ -7,10 +7,12 @@ from cnext_apitracker_backend.mongodb import mongodb
 class APIList:
     collection = mongodb.get_collection('apilist')
 
-    def __init__(self, api_endpoint, request_type, params=None, status=0, code=0, updated_at=None, _id=None):
-        self.api_endpoint = api_endpoint
-        self.request_type = request_type
-        self.params = params
+    def __init__(self, endpoint, method, params=None, headers=None, body=None, status=0, code=0, updated_at=None, _id=None):
+        self.endpoint = endpoint
+        self.method = method
+        self.params = params or {}
+        self.headers = headers or {}
+        self.body = body
         self.status = status
         self.code = code
         self.updated_at = updated_at
@@ -20,8 +22,8 @@ class APIList:
 
         if data is None:
             data = {
-                'api_endpoint': self.api_endpoint,
-                'request_type': self.request_type,
+                'endpoint': self.endpoint,
+                'method': self.method,
                 'params': self.params,
                 'status': self.status,
                 'code': self.code,
