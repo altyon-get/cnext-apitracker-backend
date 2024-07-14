@@ -70,12 +70,12 @@ class APIList:
 class APICallLog:
     collection = mongodb.get_collection('apicalllog')
 
-    def __init__(self, api_id, timestamp, response_time, _id=None):
+    def __init__(self, api_id, timestamp, response_time, _id=None, response=None):
         self.api_id = api_id
         self.timestamp = timestamp
         self.response_time = response_time
         self._id = _id
-
+        self.response = response
     def save(self):
         if self._id:
             data = self.__dict__.copy()
