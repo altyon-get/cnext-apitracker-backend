@@ -3,8 +3,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import APIList, APICallLog
-from .utils import make_api_call, handle_api_response
-
+from api.utils.api_calls import make_api_call, handle_api_response
+from api.utils.request_validators import (
+    validate_url,
+    validate_method,
+    validate_headers,
+    validate_body,
+    validate_params
+)
 
 class APIListView(APIView):
     def get(self, request):
@@ -16,15 +22,41 @@ class APIListView(APIView):
 
     def post(self, request):
         data = request.data
-        required_fields = ['api_endpoint', 'request_type']
 
+        endpoint = data.get('endpoint')
+        method = data.get('method')
+        headers = data.get('headers', {})
+        params = data.get('params', {})
+        body = data.get('body', {})
+
+        # TODO: Validate data before saving
+        required_fields = ['endpoint', 'method']
         for field in required_fields:
             if field not in data:
                 return Response({'error': f'{field} is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        #TODO: Validate data before saving
+        if not validate_url(endpoint):
+            return Response({'error': 'Invalid URL'}, status=status.HTTP_400_BAD_REQUEST)
 
-        api_entry = APIList(**data)
+        if not validate_method(method):
+            return Response({'error': 'Invalid request method'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not validate_headers(headers):
+            return Response({'error': 'Invalid headers format'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not validate_params(params):
+            return Response({'error': 'Invalid parameters format'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not validate_body(body):
+            return Response({'error': 'Invalid body format'}, status=status.HTTP_400_BAD_REQUEST)
+
+        api_entry = APIList(
+            endpoint=endpoint,
+            method=method,
+            headers=headers,
+            params=params,
+            body=body
+        )
         try:
             api_entry.save()
             response_data = make_api_call(api_entry)
@@ -50,7 +82,7 @@ class APIDetailView(APIView):
             return Response({'error': 'APIList not found'}, status=status.HTTP_404_NOT_FOUND)
 
         data = request.data
-        required_fields = ['api_endpoint', 'request_type']
+        required_fields = ['endpoint', 'method']
         for field in required_fields:
             if field not in data:
                 return Response({'error': 'Missing required field'}, status=status.HTTP_400_BAD_REQUEST)
