@@ -12,6 +12,7 @@ class LoginView(View):
         # password = request.POST['password']
         username = request.POST.get('username')
         password = request.POST.get('password')
+        
         if username == settings.USERNAME and password == settings.PASSWORD:
             payload = {
                 'username': username,
