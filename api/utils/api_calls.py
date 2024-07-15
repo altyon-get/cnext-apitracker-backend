@@ -41,6 +41,7 @@ def handle_api_response(api_entry, response_data):
         api_entry.save()
 
         api_log = APICallLog(
+            response = response_data['response'],
             api_id=api_entry._id,
             timestamp=response_data['start_time'],
             response_time=response_data['response_time']
