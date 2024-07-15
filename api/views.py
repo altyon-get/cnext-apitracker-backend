@@ -26,11 +26,13 @@ class APIListView(APIView):
             return Response({'error': 'page and page_size must be positive integers greater than 0'},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        apis = APIList.get_all(page, page_size)
-        api_dicts = [api.__dict__ for api in apis]
-        for api in api_dicts:
-            api['_id'] = str(api['_id'])
-        return Response(api_dicts)
+        apis, total_apis, page, page_size = APIList.get_all(page, page_size)
+        return Response({
+            'data': apis,
+            'total': total_apis,
+            'page': page,
+            'page_size': page_size
+        }, status=status.HTTP_200_OK)
 
     def post(self, request):
         data = request.data

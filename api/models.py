@@ -47,15 +47,11 @@ class APIList:
     @staticmethod
     def get_all(page=1, page_size=10):
         skips = page_size * (page - 1)
-        apis = list(APIList.collection.find()
-                    .skip(skips)
-                    .limit(page_size))
-        api_instances = []
+        apis = list(APIList.collection.find().skip(skips).limit(page_size))
+        total_apis = APIList.collection.count_documents({})
         for api in apis:
             api['_id'] = str(api['_id'])
-            api_instance = APIList(**api)
-            api_instances.append(api_instance)
-        return api_instances
+        return apis, total_apis, page, page_size
 
     @staticmethod
     def get_by_id(api_id):
