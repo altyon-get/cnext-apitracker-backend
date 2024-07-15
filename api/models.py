@@ -45,8 +45,11 @@ class APIList:
         return APIList(**result)
 
     @staticmethod
-    def get_all():
-        apis = list(APIList.collection.find())
+    def get_all(page=1, page_size=10):
+        skips = page_size * (page - 1)
+        apis = list(APIList.collection.find()
+                    .skip(skips)
+                    .limit(page_size))
         api_instances = []
         for api in apis:
             api['_id'] = str(api['_id'])
