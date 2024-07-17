@@ -35,13 +35,13 @@ def make_api_call(api_entry):
 
 def handle_api_response(api_entry, response_data):
     if response_data:
-        api_entry.status = 1 if response_data['response'].status_code == 200 else 0
-        api_entry.code = response_data['response'].status_code if response_data['response'] else None
+        api_entry.status = 1 if response_data['response'].status_code < 400 else 0
+        api_entry.code = response_data['response'].status_code
         api_entry.updated_at = response_data['start_time']
         api_entry.save()
 
         api_log = APICallLog(
-            response = response_data['response'],
+            response=response_data['response'],
             api_id=api_entry._id,
             timestamp=response_data['start_time'],
             response_time=response_data['response_time']
@@ -50,10 +50,10 @@ def handle_api_response(api_entry, response_data):
 
         return JsonResponse({
             'api_endpoint': api_entry.endpoint,
-            'status': 'Ok' if response_data['response'].status_code == 200 else 'Not Ok',
-            'response_code': response_data['response'].status_code,
+            'status': 'Ok' if api_entry.status < 400 else 'Not Ok',
+            'response_code': api_entry.code,
             'response_time': response_data['response_time']
         })
-    raise ValueError("Invalid response data")
-    # return JsonResponse({'error': 'Invalid response data'}, status=500)
+    # raise ValueError("Invalid response data")
+    return JsonResponse({'error': 'Invalid response data'}, status=500)
 

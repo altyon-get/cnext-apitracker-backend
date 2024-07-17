@@ -13,6 +13,7 @@ from api.utils.request_validators import (
 )
 from rest_framework.parsers import MultiPartParser, FormParser
 import json
+from .utils.json_file_handler import extract_requests
 
 class APIListView(APIView):
     def get(self, request):
@@ -44,16 +45,14 @@ class APIListView(APIView):
         headers = data.get('headers', {})
         params = data.get('params', {})
         body = data.get('body', {})
-        headers = {h['key']: h['value'] for h in data['headers'] if h['key'].strip() and h['value'].strip()}
-        params = {p['key']: p['value'] for p in data['params'] if p['key'].strip() and p['value'].strip()}
+
+        headers = {h['key'].strip(): h['value'].strip() for h in data['headers'] if h['key'].strip() and h['value'].strip()}
+        params = {p['key'].strip(): p['value'].strip() for p in data['params'] if p['key'].strip() and p['value'].strip()}
         try:
-            body = json.loads(body)
+            body = json.loads(body) if body else {}
         except json.JSONDecodeError:
             return Response({'error': "Invalid JSON body"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-        # TODO: Validate data before saving
         required_fields = ['endpoint', 'method']
         for field in required_fields:
             if field not in data:
@@ -74,7 +73,6 @@ class APIListView(APIView):
         if not validate_body(body):
             return Response({'error': 'Invalid body format'}, status=status.HTTP_400_BAD_REQUEST)
 
-        print('Validation passed')
         api_entry = APIList(
             endpoint=endpoint,
             method=method,
@@ -86,7 +84,6 @@ class APIListView(APIView):
         try:
             api_entry.save()
             response_data = make_api_call(api_entry)
-            print(response_data)
             handle_api_response(api_entry, response_data)
             return Response(api_entry.__dict__)
         except Exception as e:
@@ -169,19 +166,18 @@ def hit_api_and_log(request, api_id):
     return handle_api_response(api_entry, response_data)
 
 class UploadJSONView(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-
     def post(self, request, *args, **kwargs):
-        file_obj = request.FILES.get('file')
-        if not file_obj:
-            return Response({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
-
+        data = request.data
         try:
-            file_data = file_obj.read().decode('utf-8')
-            json_data = json.loads(file_data)
-            #TODO: json file validate krke handle krlo
-            return Response({'message': 'File processed successfully'}, status=status.HTTP_200_OK)
+            if not isinstance(data, list):
+                raise ValueError("Expected a list of folders")
+            extract_requests(data)
+            return Response({'message': 'JSON data processed successfully'}, status=status.HTTP_200_OK)
         except json.JSONDecodeError:
-            return Response({'error': 'Invalid JSON file'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Invalid JSON format'}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as ve:
+            return Response({'error': str(ve)}, status=status.HTTP_400_BAD_REQUEST)
+        except KeyError as ke:
+            return Response({'error': f'Missing key: {ke}'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
