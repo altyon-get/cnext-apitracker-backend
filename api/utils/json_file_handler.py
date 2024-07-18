@@ -89,7 +89,7 @@ def store_request(group_name, data):
         )
         api_entry.save()
         response_data = make_api_call(api_entry)
-        if response_data['response'] is None:
+        if response_data['status_code'] == 0:
             raise ConnectionError(f"API call failed for group '{group_name}'")
         response = handle_api_response(api_entry, response_data)
         return response

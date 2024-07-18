@@ -46,8 +46,8 @@ class APIListView(APIView):
         params = data.get('params', {})
         body = data.get('body', {})
 
-        headers = {h['key'].strip(): h['value'].strip() for h in data['headers'] if h['key'].strip() and h['value'].strip()}
-        params = {p['key'].strip(): p['value'].strip() for p in data['params'] if p['key'].strip() and p['value'].strip()}
+        headers = {h['key'].strip(): h['value'].strip() for h in headers if h['key'].strip() and h['value'].strip()}
+        params = {p['key'].strip(): p['value'].strip() for p in params if p['key'].strip() and p['value'].strip()}
         try:
             body = json.loads(body) if body else {}
         except json.JSONDecodeError:
@@ -106,12 +106,44 @@ class APIDetailView(APIView):
             return Response({'error': 'APIList not found'}, status=status.HTTP_404_NOT_FOUND)
 
         data = request.data
+        endpoint = data.get('endpoint')
+        method = data.get('method')
+        headers = data.get('headers', {})
+        params = data.get('params', {})
+        body = data.get('body', {})
+        headers = {h['key'].strip(): h['value'].strip() for h in headers if
+                   h['key'].strip() and h['value'].strip()}
+        params = {p['key'].strip(): p['value'].strip() for p in params if
+                  p['key'].strip() and p['value'].strip()}
+
+        try:
+            body = json.loads(body) if body else {}
+        except json.JSONDecodeError:
+            return Response({'error': "Invalid JSON body"}, status=status.HTTP_400_BAD_REQUEST)
+
         required_fields = ['endpoint', 'method']
         for field in required_fields:
             if field not in data:
-                return Response({'error': 'Missing required field'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': f'{field} is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        #TODO: validate data before saving
+        if not validate_url(endpoint):
+            return Response({'error': 'Invalid URL'}, status=status.HTTP_400_BAD_REQUEST)
+        if not validate_method(method):
+            return Response({'error': 'Invalid request method'}, status=status.HTTP_400_BAD_REQUEST)
+        if not validate_headers(headers):
+            return Response({'error': 'Invalid headers format'}, status=status.HTTP_400_BAD_REQUEST)
+        if not validate_params(params):
+            return Response({'error': 'Invalid parameters format'}, status=status.HTTP_400_BAD_REQUEST)
+        if not validate_body(body):
+            return Response({'error': 'Invalid body format'}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = {
+            'endpoint': endpoint,
+            'method': method,
+            'params': params,
+            'headers': headers,
+            'body': body
+        }
 
         try:
             api_entry = api_entry.save(data)

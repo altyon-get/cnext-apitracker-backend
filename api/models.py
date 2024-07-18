@@ -25,6 +25,8 @@ class APIList:
                 'endpoint': self.endpoint,
                 'method': self.method,
                 'params': self.params,
+                'headers': self.headers,
+                'body': self.body,
                 'status': self.status,
                 'code': self.code,
                 'updated_at': self.updated_at,
@@ -69,12 +71,13 @@ class APIList:
 class APICallLog:
     collection = mongodb.get_collection('apicalllog')
 
-    def __init__(self, api_id, timestamp, response_time, _id=None, response=None):
+    def __init__(self, api_id, timestamp, response_time, _id=None, status_code=None):
         self.api_id = api_id
         self.timestamp = timestamp
+        self.status_code = status_code
         self.response_time = response_time
         self._id = _id
-        self.response = response
+
     def save(self):
         if self._id:
             data = self.__dict__.copy()
@@ -88,6 +91,7 @@ class APICallLog:
             data = {
                 'api_id': self.api_id,
                 'timestamp': self.timestamp,
+                'status_code': self.status_code,
                 'response_time': self.response_time,
             }
             result = self.collection.insert_one(data)

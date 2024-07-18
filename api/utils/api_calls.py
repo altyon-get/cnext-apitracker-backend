@@ -19,7 +19,7 @@ def make_api_call(api_entry):
     except (ConnectionError, HTTPError, Timeout) as e:
         print(f"Request failed: {e}")
         return {
-            'response': None,
+            'status_code': 0,
             'start_time': None,
             'response_time': None,
         }
@@ -27,7 +27,7 @@ def make_api_call(api_entry):
     end_time = timezone.now()
     response_time = (end_time - start_time).total_seconds()
     return {
-        'response': response,
+        'status_code': response.status_code,
         'start_time': start_time,
         'response_time': response_time,
     }
@@ -35,15 +35,15 @@ def make_api_call(api_entry):
 
 def handle_api_response(api_entry, response_data):
     if response_data:
-        api_entry.status = 1 if response_data['response'].status_code < 400 else 0
-        api_entry.code = response_data['response'].status_code
+        api_entry.status = 1 if response_data['status_code'] < 400 else 0
+        api_entry.code = response_data['status_code']
         api_entry.updated_at = response_data['start_time']
         api_entry.save()
 
         api_log = APICallLog(
-            response=response_data['response'],
             api_id=api_entry._id,
             timestamp=response_data['start_time'],
+            status_code=response_data['status_code'],
             response_time=response_data['response_time']
         )
         api_log.save()
