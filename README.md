@@ -1,5 +1,3 @@
-# API Tracker
-
 ## Getting Started
 
 ### Prerequisites
