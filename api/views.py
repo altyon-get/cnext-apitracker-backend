@@ -1,8 +1,10 @@
+import json
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import APIList, APICallLog
+from .utils.json_file_handler import extract_requests
 from api.utils.api_calls import make_api_call, handle_api_response
 from api.utils.request_validators import (
     validate_url,
@@ -11,9 +13,6 @@ from api.utils.request_validators import (
     validate_body,
     validate_params
 )
-from rest_framework.parsers import MultiPartParser, FormParser
-import json
-from .utils.json_file_handler import extract_requests
 
 class APIListView(APIView):
     def get(self, request):

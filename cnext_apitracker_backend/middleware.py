@@ -2,8 +2,6 @@ from django.http import JsonResponse
 from api.utils.jwt_util import decode_jwt
 from django.urls import resolve
 
-#got this error: if not user or not user.is_active:rest_framework.request.WrappedAttributeError: 'dict' object has no attribute 'is_active'
-#so created a object to user similar to request.user and assigned to it
 class User:
     def __init__(self, username):
         self.username = username
@@ -26,14 +24,9 @@ class JWTAuthMiddleware:
 
         if token:
             token = token.split(' ')[1]
-            # print(token, ' -token')
             decoded_token = decode_jwt(token)
-            # print(request.user, ' -request.user')
-            # print(request.user.username, ' -request.user')
-            # print(decoded_token, ' -decoded_token')
             if decoded_token:
-                request.user.username = decoded_token['username'] #this can also solve the issue
-                # request.user = User(decoded_token['username'])
+                request.user.username = decoded_token['username']
             else:
                 return JsonResponse({'error': 'Invalid or expired token'}, status=401)
         else:

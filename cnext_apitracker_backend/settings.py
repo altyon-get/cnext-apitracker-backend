@@ -53,7 +53,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
-    # "cnext_apitracker_backend.middleware.JWTAuthMiddleware",
+    "cnext_apitracker_backend.middleware.JWTAuthMiddleware",
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
