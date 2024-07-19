@@ -21,11 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-m&=qu1+e_2f*u^!hvgp2wxfiyhddxj^4zl6wmi-m^pdq_2de$d'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = []
 
 
@@ -56,7 +55,7 @@ MIDDLEWARE = [
     "cnext_apitracker_backend.middleware.JWTAuthMiddleware",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=True, cast=bool)
 
 
 ROOT_URLCONF = 'cnext_apitracker_backend.urls'
@@ -82,8 +81,8 @@ WSGI_APPLICATION = 'cnext_apitracker_backend.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-MONGO_URI = config('DB_HOST')
-MONGO_DB_NAME = config('DB_NAME')
+MONGO_URI = config('MONGO_URI')
+MONGO_DB_NAME = config('MONGO_DB_NAME')
 USERNAME = config('ADMIN_USERNAME')
 PASSWORD = config('ADMIN_PASSWORD')
 CELERY_COLLECTION_NAME = config('CELERY_COLLECTION_NAME')
@@ -91,7 +90,7 @@ API_LIST_COLLECTION_NAME = config('API_LIST_COLLECTION_NAME')
 API_CALL_LOG_COLLECTION_NAME = config('API_CALL_LOG_COLLECTION_NAME')
 
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379/0')
 CELERY_RESULT_BACKEND = MONGO_URI
 CELERY_MONGODB_BACKEND_SETTINGS = {
     'database': MONGO_DB_NAME,
