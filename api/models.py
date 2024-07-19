@@ -1,11 +1,12 @@
 import datetime
+from django.conf import settings
 from pymongo import ReturnDocument
 from bson.objectid import ObjectId
 from cnext_apitracker_backend.mongodb import mongodb
 
 
 class APIList:
-    collection = mongodb.get_collection('apilist')
+    collection = mongodb.get_collection(settings.API_LIST_COLLECTION_NAME)
 
     def __init__(self, endpoint, method, params=None, headers=None, body=None, status=0, code=0, updated_at=None, _id=None):
         self.endpoint = endpoint
@@ -79,7 +80,7 @@ class APIList:
 
 
 class APICallLog:
-    collection = mongodb.get_collection('apicalllog')
+    collection = mongodb.get_collection(settings.API_CALL_LOG_COLLECTION_NAME)
 
     def __init__(self, api_id, timestamp, response_time, _id=None, status_code=None):
         self.api_id = api_id
