@@ -29,7 +29,7 @@ class APIListView(APIView):
             return Response({'error': 'page and page_size must be positive integers greater than 0'},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        apis, total_apis, page, page_size = APIList.get_all(page, page_size)
+        apis, total_apis, page, page_size = APIList.get_apis_with_pagination(page, page_size)
         return Response({
             'data': apis,
             'total': total_apis,

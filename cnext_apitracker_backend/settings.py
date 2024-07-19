@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -81,20 +82,18 @@ WSGI_APPLICATION = 'cnext_apitracker_backend.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-from decouple import config
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 MONGO_URI = config('DB_HOST')
 MONGO_DB_NAME = config('DB_NAME')
-USERNAME = config('USERNAME_1')
-PASSWORD = config('PASSWORD_1')
+USERNAME = config('ADMIN_USERNAME')
+PASSWORD = config('ADMIN_PASSWORD')
+CELERY_COLLECTION_NAME = config('CELERY_COLLECTION_NAME')
 
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = MONGO_URI
+CELERY_MONGODB_BACKEND_SETTINGS = {
+    'database': MONGO_DB_NAME,
+    'taskmeta_collection': CELERY_COLLECTION_NAME,
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

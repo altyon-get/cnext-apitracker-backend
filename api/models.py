@@ -47,7 +47,17 @@ class APIList:
         return APIList(**result)
 
     @staticmethod
-    def get_all(page=1, page_size=10):
+    def get_all():
+        apis = list(APIList.collection.find())
+        api_instances = []
+        for api in apis:
+            api['_id'] = str(api['_id'])
+            api_instance = APIList(**api)
+            api_instances.append(api_instance)
+        return api_instances
+
+    @staticmethod
+    def get_apis_with_pagination(page=1, page_size=10):
         skips = page_size * (page - 1)
         apis = list(APIList.collection.find().skip(skips).limit(page_size))
         total_apis = APIList.collection.count_documents({})
