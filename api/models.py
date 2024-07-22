@@ -76,8 +76,14 @@ class APIList:
 
     @staticmethod
     def delete(api_id):
-        return APIList.collection.delete_one({'_id': ObjectId(api_id)})
-
+        try:
+            result = APIList.collection.delete_one({'_id': ObjectId(api_id)})
+            if result.deleted_count == 0:
+                return False
+            APICallLog.delete(api_id)
+            return True
+        except Exception as e:
+            return False
 
 class APICallLog:
     collection = mongodb.get_collection(settings.API_CALL_LOG_COLLECTION_NAME)
@@ -124,4 +130,4 @@ class APICallLog:
 
     @staticmethod
     def delete(api_id):
-        APICallLog.collection.delete_many({'api_id': ObjectId(api_id)})
+        APICallLog.collection.delete_many({'api_id': api_id})
