@@ -4,5 +4,5 @@
 nohup python3 manage.py runserver 
 #nohup celery -A cnext_apitracker_backend worker --loglevel=info &
 #nohup celery -A cnext_apitracker_backend beat --loglevel=info &
-#tail -f /var/log/python*
+tail -f /var/log/python*
 
