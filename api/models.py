@@ -1,8 +1,10 @@
-import datetime
+import pytz
 from django.conf import settings
 from pymongo import ReturnDocument
 from bson.objectid import ObjectId
 from cnext_apitracker_backend.mongodb import mongodb
+
+ist = pytz.timezone('Asia/Kolkata')
 
 
 class APIList:
@@ -53,6 +55,7 @@ class APIList:
         api_instances = []
         for api in apis:
             api['_id'] = str(api['_id'])
+            api['updated_at'] = api['updated_at'].replace(tzinfo=pytz.UTC).astimezone(ist)
             api_instance = APIList(**api)
             api_instances.append(api_instance)
         return api_instances
@@ -64,6 +67,7 @@ class APIList:
         total_apis = APIList.collection.count_documents({})
         for api in apis:
             api['_id'] = str(api['_id'])
+            api['updated_at'] = api['updated_at'].replace(tzinfo=pytz.UTC).astimezone(ist)
         return apis, total_apis, page, page_size
 
     @staticmethod
@@ -71,6 +75,7 @@ class APIList:
         api_data = APIList.collection.find_one({'_id': ObjectId(api_id)})
         if api_data:
             api_data['_id'] = str(api_data['_id'])
+            api_data['updated_at'] = api_data['updated_at'].replace(tzinfo=pytz.UTC).astimezone(ist)
             return APIList(**api_data)
         return None
 
@@ -126,6 +131,7 @@ class APICallLog:
         for log in call_logs:
             log['_id'] = str(log['_id'])
             log['api_id'] = str(log['api_id'])
+            log['timestamp'] = log['timestamp'].replace(tzinfo=pytz.UTC).astimezone(ist)
         return call_logs, total_logs
 
     @staticmethod
