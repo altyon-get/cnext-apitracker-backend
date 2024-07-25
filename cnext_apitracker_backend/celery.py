@@ -9,6 +9,7 @@ app = Celery('cnext_apitracker_backend')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
 
+app.conf.timezone = 'Asia/Kolkata'
 app.conf.beat_schedule = {
     'hit-apis-every-hour': {
         'task': 'api.tasks.hit_apis_and_log',

@@ -1,5 +1,4 @@
 import json
-from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -188,13 +187,14 @@ class APICallLogListView(APIView):
         })
 
 
-def hit_api_and_log(request, api_id):
-    api_entry = APIList.get_by_id(api_id)
-    if not api_entry:
-        return JsonResponse({'error': 'APIList not found'}, status=404)
+class HitApiAndLogView(APIView):
+    def post(self, request, api_id):
+        api_entry = APIList.get_by_id(api_id)
+        if not api_entry:
+            return Response({'error': 'APIList not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    response_data = make_api_call(api_entry)
-    return handle_api_response(api_entry, response_data)
+        response_data = make_api_call(api_entry)
+        return handle_api_response(api_entry, response_data)
 
 class UploadJSONView(APIView):
     def post(self, request, *args, **kwargs):

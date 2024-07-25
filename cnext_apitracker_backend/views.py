@@ -1,20 +1,21 @@
-from django.http import JsonResponse
-from django.views import View
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 from django.conf import settings
 from api.utils.jwt_util import generate_jwt
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view, permission_classes
 
-@method_decorator(csrf_exempt, name='dispatch')
-class LoginView(View):
+@permission_classes([AllowAny])
+class LoginView(APIView):
     def post(self, request):
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username = request.data.get('username')
+        password = request.data.get('password')
         
         if username == settings.USERNAME and password == settings.PASSWORD:
             payload = {
                 'username': username,
             }
             token = generate_jwt(payload)
-            return JsonResponse({'token': token})
-        return JsonResponse({'error': 'Invalid credentials'}, status=401)
+            return Response({'token': token}, status=status.HTTP_200_OK)
+        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
