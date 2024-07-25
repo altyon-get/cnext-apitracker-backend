@@ -1,9 +1,9 @@
 import requests
 from django.utils import timezone
-from django.http import JsonResponse
 from api.models import APICallLog
 from requests.exceptions import ConnectionError, HTTPError, Timeout
-
+from rest_framework.response import Response
+from rest_framework import status
 
 def make_api_call(api_entry):
     start_time = timezone.now()
@@ -48,12 +48,12 @@ def handle_api_response(api_entry, response_data):
         )
         api_log.save()
 
-        return JsonResponse({
+        return Response({
             'api_endpoint': api_entry.endpoint,
             'status': 'Ok' if api_entry.status < 400 else 'Not Ok',
             'response_code': api_entry.code,
             'response_time': response_data['response_time']
-        })
+        }, status=status.HTTP_200_OK)
     # raise ValueError("Invalid response data")
-    return JsonResponse({'error': 'Invalid response data'}, status=500)
+    return Response({'error': 'Internal API Call Failed'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
