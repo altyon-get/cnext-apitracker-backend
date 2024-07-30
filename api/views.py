@@ -5,6 +5,7 @@ from rest_framework import status
 from .models import APIList, APICallLog
 from .utils.json_file_handler import extract_requests
 from api.utils.api_calls import make_api_call, handle_api_response
+from api.utils.load_test import load_test_api   
 from api.utils.request_validators import (
     validate_url,
     validate_method,
@@ -212,3 +213,22 @@ class UploadJSONView(APIView):
             return Response({'error': f'Missing key: {ke}'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+     
+class LoadTestApiView(APIView):
+    def get(self, request, api_id, *args, **kwargs):
+        user_count = int(request.GET.get('user_count', 10))
+        duration = int(request.GET.get('duration', 10))
+        try:
+            responses, min_response_time, max_response_time, avg_response_time = load_test_api(user_count, duration, api_id)
+            return Response({
+                 'user_count': user_count,
+                 'duration': duration,
+                 'responses': responses,
+                 'min_response_time':min_response_time,
+                 'max_response_time': max_response_time,
+                 'avg_response_time': avg_response_time },
+                status=status.HTTP_200_OK)
+        except  Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
