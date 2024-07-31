@@ -18,6 +18,19 @@ class APIListView(APIView):
     def get(self, request):
         page = request.query_params.get('page', 1)
         page_size = request.query_params.get('page_size', 10)
+        search_term = request.query_params.get('search_term', None)
+        method = request.query_params.get('method', '')
+        status_filter = request.query_params.get('status')
+        code = request.query_params.get('code', '')
+        print(page, page_size, search_term, method, status_filter, code, ' -XXX')
+
+
+        if status_filter:
+            if status_filter.lower() == 'true':
+                status_filter = 1
+            else:
+                status_filter = 0
+
 
         try:
             page = int(page)
@@ -28,7 +41,18 @@ class APIListView(APIView):
             return Response({'error': 'page and page_size must be positive integers greater than 0'},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        apis, total_apis, page, page_size = APIList.get_apis_with_pagination(page, page_size)
+        query = {}
+        if search_term:
+            query['endpoint'] = {'$regex': search_term, '$options': 'i'}
+        if method:
+            query['method'] = method
+        if status_filter:
+            query['status'] = status_filter
+        if code:
+            query['code'] = code
+
+        apis, total_apis, page, page_size = APIList.get_apis_with_pagination(query, page, page_size)
+
         return Response({
             'data': apis,
             'total': total_apis,
