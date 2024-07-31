@@ -5,6 +5,7 @@ from rest_framework import status
 from .models import APIList, APICallLog
 from .utils.json_file_handler import extract_requests
 from api.utils.api_calls import make_api_call, handle_api_response
+from api.utils.load_test import load_test_api   
 from api.utils.request_validators import (
     validate_url,
     validate_method,
@@ -17,6 +18,19 @@ class APIListView(APIView):
     def get(self, request):
         page = request.query_params.get('page', 1)
         page_size = request.query_params.get('page_size', 10)
+        search_term = request.query_params.get('search_term', None)
+        method = request.query_params.get('method', '')
+        status_filter = request.query_params.get('status')
+        code = request.query_params.get('code', '')
+        print(page, page_size, search_term, method, status_filter, code, ' -XXX')
+
+
+        if status_filter:
+            if status_filter.lower() == 'true':
+                status_filter = 1
+            else:
+                status_filter = 0
+
 
         try:
             page = int(page)
@@ -27,7 +41,18 @@ class APIListView(APIView):
             return Response({'error': 'page and page_size must be positive integers greater than 0'},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        apis, total_apis, page, page_size = APIList.get_apis_with_pagination(page, page_size)
+        query = {}
+        if search_term:
+            query['endpoint'] = {'$regex': search_term, '$options': 'i'}
+        if method:
+            query['method'] = method
+        if status_filter:
+            query['status'] = status_filter
+        if code:
+            query['code'] = code
+
+        apis, total_apis, page, page_size = APIList.get_apis_with_pagination(query, page, page_size)
+
         return Response({
             'data': apis,
             'total': total_apis,
@@ -212,3 +237,22 @@ class UploadJSONView(APIView):
             return Response({'error': f'Missing key: {ke}'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+     
+class LoadTestApiView(APIView):
+    def get(self, request, api_id, *args, **kwargs):
+        user_count = int(request.GET.get('user_count', 10))
+        duration = int(request.GET.get('duration', 10))
+        try:
+            responses, min_response_time, max_response_time, avg_response_time = load_test_api(user_count, duration, api_id)
+            return Response({
+                 'user_count': user_count,
+                 'duration': duration,
+                 'responses': responses,
+                 'min_response_time':min_response_time,
+                 'max_response_time': max_response_time,
+                 'avg_response_time': avg_response_time },
+                status=status.HTTP_200_OK)
+        except  Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        

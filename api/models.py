@@ -1,6 +1,6 @@
 import pytz
 from django.conf import settings
-from pymongo import ReturnDocument
+from pymongo import ReturnDocument, DESCENDING
 from bson.objectid import ObjectId
 from cnext_apitracker_backend.mongodb import mongodb
 
@@ -55,19 +55,22 @@ class APIList:
         api_instances = []
         for api in apis:
             api['_id'] = str(api['_id'])
-            api['updated_at'] = api['updated_at'].replace(tzinfo=pytz.UTC).astimezone(ist)
+            if api['updated_at']: api['updated_at'] = api['updated_at'].replace(tzinfo=pytz.UTC).astimezone(ist)
             api_instance = APIList(**api)
             api_instances.append(api_instance)
         return api_instances
 
     @staticmethod
-    def get_apis_with_pagination(page=1, page_size=10):
+    def get_apis_with_pagination(query, page=1, page_size=10):
         skips = page_size * (page - 1)
-        apis = list(APIList.collection.find().skip(skips).limit(page_size))
+        apis = list(APIList.collection.find(query).skip(skips).limit(page_size))
         total_apis = APIList.collection.count_documents({})
         for api in apis:
             api['_id'] = str(api['_id'])
-            api['updated_at'] = api['updated_at'].replace(tzinfo=pytz.UTC).astimezone(ist)
+            latest_log = APICallLog.collection.find_one({'api_id': api['_id']},sort=[('_id', DESCENDING)], projection={'response_time': 1})
+            response_time = latest_log.get('response_time') if latest_log else None
+            api['response_time'] = response_time
+            if api['updated_at']: api['updated_at'] = api['updated_at'].replace(tzinfo=pytz.UTC).astimezone(ist)
         return apis, total_apis, page, page_size
 
     @staticmethod
@@ -75,7 +78,7 @@ class APIList:
         api_data = APIList.collection.find_one({'_id': ObjectId(api_id)})
         if api_data:
             api_data['_id'] = str(api_data['_id'])
-            api_data['updated_at'] = api_data['updated_at'].replace(tzinfo=pytz.UTC).astimezone(ist)
+            if api_data['updated_at']: api_data['updated_at'] = api_data['updated_at'].replace(tzinfo=pytz.UTC).astimezone(ist)
             return APIList(**api_data)
         return None
 
@@ -124,6 +127,7 @@ class APICallLog:
     def get_by_api(api_id, page=1, page_size=10):
         skips = page_size * (page - 1)
         cursor = (APICallLog.collection.find({'api_id': api_id})
+                  .sort('timestamp', DESCENDING) 
                   .skip(skips)
                   .limit(page_size))
         total_logs = APICallLog.collection.count_documents({'api_id': api_id})
