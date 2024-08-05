@@ -64,7 +64,7 @@ class APIList:
     def get_apis_with_pagination(query, page=1, page_size=10):
         skips = page_size * (page - 1)
         apis = list(APIList.collection.find(query).skip(skips).limit(page_size))
-        total_apis = APIList.collection.count_documents({})
+        total_apis = APIList.collection.count_documents(query)
         for api in apis:
             api['_id'] = str(api['_id'])
             latest_log = APICallLog.collection.find_one({'api_id': api['_id']},sort=[('_id', DESCENDING)], projection={'response_time': 1})
