@@ -6,7 +6,6 @@ from .models import APIList, APICallLog
 from .utils.json_file_handler import extract_requests
 from api.utils.api_calls import make_api_call, handle_api_response
 from api.utils.load_test import load_test_api
-from api.utils.load_test2 import run_test
 from api.utils.request_validators import (
     validate_url,
     validate_method,
