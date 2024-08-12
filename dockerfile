@@ -1,12 +1,6 @@
-FROM python:3.8.12-slim
+FROM public.ecr.aws/careers360/cnext-backend-base:arm64 AS base
 
-# Install build dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    libc-dev \
-    libffi-dev \
-    build-essential \
-    && apt-get clean
+FROM base AS backend
 
 WORKDIR /app
 COPY requirements.txt /app/
