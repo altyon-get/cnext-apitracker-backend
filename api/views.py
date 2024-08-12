@@ -22,8 +22,6 @@ class APIListView(APIView):
         method = request.query_params.get('method', '')
         status_filter = request.query_params.get('status')
         code = request.query_params.get('code', '')
-        print(page, page_size, search_term, method, status_filter, code, ' -XXX')
-
 
         try:
             page = int(page)
