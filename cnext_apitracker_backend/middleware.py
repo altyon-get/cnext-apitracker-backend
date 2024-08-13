@@ -13,7 +13,7 @@ class User:
 class JWTAuthMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
-        self.public_urls = ['login']
+        self.public_urls = ['login','test']
 
     def __call__(self, request):
         token = request.META.get('HTTP_AUTHORIZATION')

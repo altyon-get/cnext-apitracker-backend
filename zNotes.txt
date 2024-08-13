@@ -1,0 +1,27 @@
+
+
+# Clear celery
+Redis: redis-cli FLUSHALL
+Django Database: TaskResult.objects.all().delete() in the Django shell
+Celery Commands: celery control revoke, celery control discard_all, and celery purge
+Django Management Command: python manage.py celery purge
+
+The chord in Celery is a powerful feature that allows you to run a set of tasks in parallel (a group) and then execute a callback when all the tasks are done. However, it relies on the result backend to store intermediate results. If there are issues with the result backend, you might see retries or other errors.
+
+celery -A cnext_apitracker_backend inspect reserved
+celery -A cnext_apitracker_backend inspect scheduled
+celery -A cnext_apitracker_backend inspect active
+
+celery -A cnext_apitracker_backend control revoke <task_id>
+
+celery -A cnext_apitracker_backend flower
+
+
+# git
+git stash clear
+git stash drop stash@{0}
+
+The error AssertionError: .accepted_renderer not set on Response is occurring because the Django view is not set up to use the DRF's request and response handling, but you're returning a DRF Response object. When using DRF's Response, you need to ensure the view is set up to handle DRF requests and responses.
+
+
+os.cpu_count()
